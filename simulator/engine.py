@@ -58,7 +58,10 @@ class ResponderLog:
         tr = self.sim.truth.get(a.event_id)
         if a.event_type.value in ("WATER_SHORTAGE", "POTENTIAL_FIRE_CLUSTER"):
             k = (a.payload.get("rule_id"), a.geo_cell)
-            self.derived.setdefault(k, t)
+            if k not in self.derived:
+                self.derived[k] = t
+                self.sim.events_log.append({"t": t, "type": "ECP_AT_RESPONDER", "rule": k[0], "cell": k[1],
+                                            "derived_type": a.event_type.value, "magnitude": a.payload.get("magnitude")})
             return
         if a.evidence is not None and tr is not None:
             self.evidence_delivered.add(a.event_id)
@@ -371,6 +374,10 @@ class Simulation:
                 d.update(queue=len(n.store), summaries=len(n.summaries))
             fr["nodes"].append(d)
         fr["sa"] = self.sa_series[-1][1:] if self.sa_series else None
+        fr["spl_rejected"] = sum(n.spl.stats.rejected for n in self.nodes.values() if getattr(n, "spl", None))
+        fr["spl_permitted"] = sum(n.spl.stats.permitted for n in self.nodes.values() if getattr(n, "spl", None))
+        fr["ecp_promotions"] = self.ecp_promotions
+        fr["replicas"] = sum(len(h) for n in self.nodes.values() if n.kind == "cpmm" for h in n.replicas.values())
         return fr
 
     def _final(self, wall: float) -> dict:
