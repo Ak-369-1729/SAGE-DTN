@@ -285,6 +285,9 @@ def _evidence_phase(a: CPMMNode, b: CPMMNode, budget: float, t: float) -> int:
         for eid, holders in a.replicas.items():
             if len(holders) >= cfg.evidence_replicas or b.id in holders or b.state.evidence.has(eid):
                 continue
+            if (cfg.replica_placement == "prefer_mobile" and b.role != "FERRY"
+                    and len(holders) < min(cfg.evidence_replicas, cfg.n_ferries)):
+                continue
             rec = a.state.evidence.get(eid)
             if rec is None:
                 continue

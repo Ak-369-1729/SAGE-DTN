@@ -109,12 +109,17 @@ def e4():
     if not rows:
         return
     fig, ax = plt.subplots(1, 2, figsize=(10, 4.2))
-    for c, col in ((0.0, "#1f77b4"), (0.1, "#ff7f0e")):
-        rs = sorted([r for r in rows if r["replica_corrupt_prob"] == c], key=lambda r: r["replicas"])
-        ax[0].plot([r["replicas"] for r in rs], [r["recovery_probability"] for r in rs], "-o", color=col,
-                   label=f"corrupt replica prob {c}")
-        ax[1].errorbar([r["replicas"] for r in rs], [r["latency_mean_s"] for r in rs],
-                       yerr=[r["latency_ci95_s"] for r in rs], marker="o", color=col, capsize=3, label=f"corrupt {c}")
+    styles = {("first_contact", 0.0): ("#1f77b4", "-"), ("first_contact", 0.1): ("#1f77b4", "--"),
+              ("prefer_mobile", 0.0): ("#2ca02c", "-"), ("prefer_mobile", 0.1): ("#2ca02c", "--")}
+    for (pl, c), (col, ls) in styles.items():
+        rs = sorted([r for r in rows if r.get("replica_placement", "first_contact") == pl and r["replica_corrupt_prob"] == c],
+                    key=lambda r: r["replicas"])
+        if not rs:
+            continue
+        ax[0].plot([r["replicas"] for r in rs], [r["recovery_probability"] for r in rs], ls, marker="o", color=col,
+                   label=f"{pl}, corrupt {c}")
+        ax[1].errorbar([r["replicas"] for r in rs], [r["latency_mean_s"] for r in rs], yerr=[r["latency_ci95_s"] for r in rs],
+                       marker="o", ls=ls, color=col, capsize=3, label=f"{pl}, corrupt {c}")
     ax[0].set_xlabel("Evidence replicas R (source destroyed)")
     ax[0].set_ylabel("Recovery probability")
     ax[1].set_xlabel("Evidence replicas R")

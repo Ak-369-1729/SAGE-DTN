@@ -17,28 +17,35 @@ from simulator.scenario import ScenarioConfig
 REPLICAS = [0, 1, 3, 5]
 
 
-def cfg(seed, R, corrupt):
+PLACEMENTS = ["first_contact", "prefer_mobile"]
+
+
+def cfg(seed, R, corrupt, placement="first_contact"):
     return ScenarioConfig(name="e4_recovery", seed=seed, evidence_replicas=R, source_loss_s=5400,
                           source_loss_nodes=["F0_0", "F0_1"], recovery_request_s=5460,
-                          protected_forward_max_fidelity=1, replica_corrupt_prob=corrupt).to_dict()
+                          protected_forward_max_fidelity=1, replica_corrupt_prob=corrupt,
+                          replica_placement=placement).to_dict()
 
 
 def main():
     started = time.time()
     seeds = [1, 2, 3] if quick() else list(range(1, 11))
-    jobs = [(cfg(s, R, c), "I_full_recovery") for c in (0.0, 0.1) for R in REPLICAS for s in seeds]
+    jobs = [(cfg(s, R, c, pl), "I_full_recovery") for pl in PLACEMENTS for c in (0.0, 0.1) for R in REPLICAS for s in seeds]
     rows = run_many(jobs)
     for r in rows:
         r["replica_corrupt_prob"] = r["config"]["replica_corrupt_prob"]
+        r["replica_placement"] = r["config"]["replica_placement"]
     write_csv(RAW / "e4_recovery.csv", rows)
     summ = []
-    for c in (0.0, 0.1):
+    for pl in PLACEMENTS:
+      for c in (0.0, 0.1):
         for R in REPLICAS:
-            sub = [r for r in rows if r["evidence_replicas"] == R and r["replica_corrupt_prob"] == c]
+            sub = [r for r in rows if r["evidence_replicas"] == R and r["replica_corrupt_prob"] == c
+                   and r["replica_placement"] == pl]
             req = sum(r.get("recovery_requests", 0) for r in sub)
             ok = sum(r.get("recovery_success", 0) for r in sub)
             lat = mean_ci([r.get("recovery_latency_mean_s", float("nan")) for r in sub])
-            summ.append({"replica_corrupt_prob": c, "replicas": R, "runs": len(sub), "requests": req, "recovered": ok,
+            summ.append({"replica_placement": pl, "replica_corrupt_prob": c, "replicas": R, "runs": len(sub), "requests": req, "recovered": ok,
                          "recovery_probability": ok / req if req else float("nan"),
                          "latency_mean_s": lat[0], "latency_ci95_s": lat[1],
                          "recovery_bytes_per_request": sum(r.get("recovery_bytes", 0) for r in sub) / req if req else float("nan"),
@@ -48,7 +55,9 @@ def main():
                          "CDR": mean_ci([r["CDR"] for r in sub])[0]})
     write_csv(TABLES / "e4_recovery_summary.csv", summ)
     write_manifest("e4_source_loss_recovery", seeds=seeds, scenario="source loss F0_0,F0_1 @5400s, request @5460s",
-                   configuration={"replicas": REPLICAS, "corrupt_probs": [0.0, 0.1], "mode": "I_full_recovery"},
+                   configuration={"replicas": REPLICAS, "corrupt_probs": [0.0, 0.1], "placements": PLACEMENTS,
+                                  "mode": "I_full_recovery",
+                                  "note": "prefer_mobile was added after the first_contact run showed co-located replicas sharing the source's fate"},
                    outputs=["results/raw/e4_recovery.csv", "results/tables/e4_recovery_summary.csv"], started=started)
     for r in summ:
         print(r)

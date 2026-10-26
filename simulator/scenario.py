@@ -67,6 +67,7 @@ class ScenarioConfig:
     source_loss_nodes: list = field(default_factory=list)
     recovery_request_s: float | None = None
     replica_corrupt_prob: float = 0.0
+    replica_placement: str = "first_contact"   # or "prefer_mobile": first min(R, ferries) replicas only on ferries
     protected_forward_max_fidelity: int | None = None   # experimental control (E4)
     ml: bool = False
     utility: dict = field(default_factory=dict)
