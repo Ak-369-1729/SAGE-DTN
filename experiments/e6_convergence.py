@@ -24,8 +24,8 @@ def ecp_set(sim, st, t):
 
 def main():
     started = time.time()
-    run_seeds = [1, 2] if quick() else [1, 2, 3]
-    perms = 10 if quick() else 50
+    run_seeds = [1] if quick() else [1, 2]
+    perms = 5 if quick() else 20
     rows, summary = [], []
     for rs in run_seeds:
         sim = Simulation(ScenarioConfig(name="e6", seed=rs), "H_full_core")

@@ -1,0 +1,6 @@
+# For the Wokwi VS Code extension / wokwi-cli. Build first, e.g.:
+#   arduino-cli compile --fqbn esp32:esp32:esp32 --output-dir build wokwi/sensor-node
+[wokwi]
+version = 1
+firmware = "build/sketch.ino.bin"
+elf = "build/sketch.ino.elf"

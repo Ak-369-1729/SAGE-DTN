@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAGE-DTN Simulator</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1d2433;--muted:#6b7385;--line:#d9dde5;--accent:#1f6feb;
+--field:#1f77b4;--sensor:#2ca02c;--ferry:#ff7f0e;--resp:#d62728;--dead:#999}
+@media (prefers-color-scheme:dark){:root{--bg:#11151c;--panel:#1a202b;--ink:#e6e9ef;--muted:#9aa3b5;--line:#2c3443;--accent:#58a6ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0}header small{color:var(--muted)}
+main{display:grid;grid-template-columns:300px 1fr 320px;gap:12px;padding:12px}
+@media (max-width:1100px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+label{display:flex;justify-content:space-between;gap:8px;margin:4px 0;font-size:12.5px}
+input,select,textarea{width:130px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:2px 4px}
+textarea{width:100%;height:70px;font:11px monospace}
+button{background:var(--accent);color:#fff;border:0;border-radius:5px;padding:6px 10px;margin:3px 2px;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+canvas{width:100%;aspect-ratio:1/1;max-height:78vh;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+h3{margin:10px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12px}td{padding:2px 4px;border-bottom:1px solid var(--line)}td:last-child{text-align:right}
+#log{height:180px;overflow:auto;font:11.5px monospace;white-space:pre-wrap}
+.legend span{display:inline-block;margin-right:10px;font-size:12px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+#scrub{width:100%}
+</style>
+</head>
+<body>
+<header><h1>SAGE-DTN Simulator</h1><small>Deterministic core runs server-side; every number shown comes from the run.</small>
+<span class="legend"><span><i class="dot" style="background:var(--field)"></i>Field</span><span><i class="dot" style="background:var(--sensor)"></i>Sensor</span><span><i class="dot" style="background:var(--ferry)"></i>Ferry</span><span><i class="dot" style="background:var(--resp)"></i>Responder</span></span></header>
+<main>
+<section class="panel" id="cfg">
+<h3>System mode</h3><label>Mode<select id="mode"></select></label>
+<h3>Topology</h3>
+<label>Villages<input type="number" id="n_villages" min="1" max="3"></label>
+<label>Field (human) nodes / village<input type="number" id="field_per_village" min="1" max="8"></label>
+<label>Sensor nodes / village<input type="number" id="sensor_per_village" min="0" max="8"></label>
+<label>Ferries<input type="number" id="n_ferries" min="0" max="8"></label>
+<label>Responders<input type="number" id="n_responders" min="1" max="4"></label>
+<h3>Resources</h3>
+<label>Bandwidth (B/s)<input type="number" id="bandwidth_Bps"></label>
+<label>Contact dwell (s)<input type="number" id="contact_dwell_s"></label>
+<label>Field storage (B)<input type="number" id="storage_field_B"></label>
+<label>Ferry storage (B)<input type="number" id="storage_ferry_B"></label>
+<label>Field battery (J)<input type="number" id="battery_field_J"></label>
+<h3>Workload</h3>
+<label>Human-report load (x)<input type="number" step="0.5" id="human_load"></label>
+<label>Sensor publish period (s)<input type="number" id="sensor_publish_s"></label>
+<label>Duplicate rate<input type="number" step="0.05" id="duplicate_rate"></label>
+<label style="display:block">Event mix (reports / village / h)<textarea id="human_rates_per_village_h"></textarea></label>
+<h3>Evidence</h3>
+<label>Evidence replicas<input type="number" id="evidence_replicas" min="0" max="8"></label>
+<label>Source-loss time (s, blank=none)<input type="number" id="source_loss_s"></label>
+<label>Lost nodes (comma)<input id="source_loss_nodes"></label>
+<label>Corrupt replica prob<input type="number" step="0.05" id="replica_corrupt_prob"></label>
+<h3>Run</h3>
+<label>Horizon (s)<input type="number" id="horizon_s"></label>
+<label>Random seed<input type="number" id="seed"></label>
+<div><button id="run">Run</button><button class="sec" id="pause">Pause</button><button class="sec" id="reset">Reset</button></div>
+<div><button class="sec" id="expScen">Export scenario</button><button class="sec" id="expRes">Export results</button><button class="sec" id="expCsv">Metrics CSV</button></div>
+<div id="status" style="color:var(--muted);font-size:12px"></div>
+</section>
+<section>
+<canvas id="cv" width="900" height="900"></canvas>
+<input type="range" id="scrub" min="0" max="0" value="0">
+<div id="tlabel" style="color:var(--muted);font-size:12px"></div>
+</section>
+<section class="panel">
+<h3>Live state (selected time)</h3><table id="live"></table>
+<h3>Final metrics</h3><table id="metrics"></table>
+<h3>Events (SPL / ECP / source loss / recovery)</h3><div id="log"></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const FIELDS=["n_villages","field_per_village","sensor_per_village","n_ferries","n_responders","bandwidth_Bps","contact_dwell_s","storage_field_B","storage_ferry_B","battery_field_J","human_load","sensor_publish_s","duplicate_rate","evidence_replicas","source_loss_s","replica_corrupt_prob","horizon_s","seed"];
+let base={},result=null,frame=0,timer=null;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+async function init(){
+  const modes=await (await fetch('/api/modes')).json();
+  modes.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=m.label;$('mode').appendChild(o)});
+  $('mode').value='I_full_recovery';
+  base=await (await fetch('/api/default-scenario')).json();
+  fill(base);
+}
+function fill(s){FIELDS.forEach(f=>$(f).value=s[f]??'');$('human_rates_per_village_h').value=JSON.stringify(s.human_rates_per_village_h);$('source_loss_nodes').value=(s.source_loss_nodes||[]).join(',')}
+function scenario(){
+  const s={...base};
+  FIELDS.forEach(f=>{const v=$(f).value;s[f]=v===''?null:Number(v)});
+  ['n_villages','field_per_village','sensor_per_village','n_ferries','n_responders','evidence_replicas','seed','horizon_s','storage_field_B','storage_ferry_B'].forEach(k=>s[k]=s[k]==null?null:Math.round(s[k]));
+  try{s.human_rates_per_village_h=JSON.parse($('human_rates_per_village_h').value)}catch(e){}
+  s.source_loss_nodes=$('source_loss_nodes').value.split(',').map(x=>x.trim()).filter(Boolean);
+  s.ml=$('mode').value.startsWith('J');
+  return s;
+}
+async function run(){
+  stop();$('status').textContent='Running deterministic simulation…';
+  const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:$('mode').value,scenario:scenario()})});
+  if(!r.ok){$('status').textContent='Error: '+(await r.text());return}
+  result=await r.json();frame=0;$('scrub').max=result.timeline.length-1;
+  $('status').textContent=`Done in ${result.metrics.wall_s}s · ${result.timeline.length} frames · code ${result.metrics.code_version} · ${result.metrics.policy_version}`;
+  showMetrics();play();
+}
+function play(){stop();timer=setInterval(()=>{if(!result)return;draw(frame);frame++;if(frame>=result.timeline.length){stop();frame=result.timeline.length-1}},120)}
+function stop(){if(timer)clearInterval(timer);timer=null}
+function draw(i){
+  const cv=$('cv'),g=cv.getContext('2d'),W=cv.width,S=W/8000;$('scrub').value=i;
+  g.clearRect(0,0,W,W);const fr=result.timeline[i];if(!fr)return;
+  g.strokeStyle=css('--line');g.lineWidth=1;
+  for(let x=0;x<=8000;x+=500){g.beginPath();g.moveTo(x*S,0);g.lineTo(x*S,W);g.stroke();g.beginPath();g.moveTo(0,x*S);g.lineTo(W,x*S);g.stroke()}
+  result.villages.forEach((v,k)=>{g.fillStyle=css('--muted');g.font='13px sans-serif';g.fillText('Village '+k,v[0]*S-25,W-v[1]*S-60)});
+  g.fillText('Base',result.base[0]*S-10,W-result.base[1]*S+40);
+  const pos={};fr.nodes.forEach(n=>pos[n.id]=n);
+  g.strokeStyle=css('--accent');g.lineWidth=2;
+  fr.contacts.forEach(([a,b])=>{const A=pos[a],B=pos[b];g.beginPath();g.moveTo(A.x*S,W-A.y*S);g.lineTo(B.x*S,W-B.y*S);g.stroke()});
+  const col={FIELD:'--field',SENSOR:'--sensor',FERRY:'--ferry',RESPONDER:'--resp'};
+  fr.nodes.forEach(n=>{const r=5+Math.min(14,Math.sqrt(n.storage/4096));g.beginPath();g.arc(n.x*S,W-n.y*S,r,0,7);
+    g.fillStyle=n.alive?css(col[n.role]):css('--dead');g.fill();g.fillStyle=css('--ink');g.font='10px monospace';g.fillText(n.id,n.x*S+r+1,W-n.y*S-r)});
+  $('tlabel').textContent=`t = ${fr.t}s · contacts ${fr.contacts.length} · TBT ${(fr.tbt/1e6).toFixed(2)} MB (node radius ∝ √storage)`;
+  const tot=k=>fr.nodes.reduce((s,n)=>s+(n[k]||0),0);
+  const rows=[['Situational awareness',fr.sa?fr.sa[0].toFixed(3):'-'],['SA critical usable',fr.sa?fr.sa[1].toFixed(3):'-'],['SA aggregate accuracy',fr.sa?fr.sa[2].toFixed(3):'-'],['SA fresh sensor',fr.sa?fr.sa[3].toFixed(3):'-'],
+   ['Protected entries (all nodes)',tot('protected')],['Aggregate sketches (all nodes)',tot('aggregates')],['Queued bundles (all nodes)',tot('queue')],['Evidence records held',tot('evidence')],['Evidence replicas placed',fr.replicas],
+   ['SPL permitted / rejected',`${fr.spl_permitted} / ${fr.spl_rejected}`],['ECP promotions',fr.ecp_promotions],['Explicit conflicts',tot('conflicts')],['Dead nodes',fr.nodes.filter(n=>!n.alive).length]];
+  $('live').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+  $('log').textContent=result.events.filter(e=>e.t<=fr.t).map(e=>`${String(e.t).padStart(6)}s ${e.type} ${Object.entries(e).filter(([k])=>!['t','type'].includes(k)).map(([k,v])=>k+'='+v).join(' ')}`).join('\n');
+}
+function showMetrics(){
+  const m=result.metrics,keys=['critical_generated','CDR','critical_info_loss','TBT_bytes','SAT_s','SA_mean','peak_storage_B','summary_error','utility_per_kB','energy_proxy_J','ecp_detected','ecp_false','ecp_missed','ecp_latency_mean_s','recovery_requests','recovery_probability','recovery_latency_mean_s','recovery_integrity_failures_detected','spl_rejected'];
+  $('metrics').innerHTML=keys.filter(k=>k in m).map(k=>`<tr><td>${k}</td><td>${typeof m[k]=='number'?(Number.isInteger(m[k])?m[k]:m[k].toFixed(3)):m[k]}</td></tr>`).join('');
+}
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click()}
+$('run').onclick=run;$('pause').onclick=()=>timer?stop():play();$('reset').onclick=()=>{stop();result=null;fill(base);$('cv').getContext('2d').clearRect(0,0,900,900);$('metrics').innerHTML=$('live').innerHTML=$('log').textContent='';$('status').textContent=''};
+$('scrub').oninput=e=>{stop();frame=+e.target.value;if(result)draw(frame)};
+$('expScen').onclick=()=>dl('sage_scenario.json',JSON.stringify({mode:$('mode').value,scenario:scenario()},null,2),'application/json');
+$('expRes').onclick=()=>result&&dl('sage_results.json',JSON.stringify(result,null,1),'application/json');
+$('expCsv').onclick=()=>{if(!result)return;const m=result.metrics,k=Object.keys(m).filter(x=>typeof m[x]!='object');dl('sage_metrics.csv',k.join(',')+'\n'+k.map(x=>m[x]).join(','),'text/csv')};
+init();
+</script>
+</body>
+</html>

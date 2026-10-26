@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sage.aeio.v1",
+  "title": "SAGE-DTN AEIO line (node wire format)",
+  "type": "object",
+  "required": ["schema", "event_id", "event_type", "fidelity_level", "geo_cell", "observed_at", "origin_node", "policy_version"],
+  "properties": {
+    "schema": {"const": "sage.aeio.v1"},
+    "event_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "event_type": {"enum": ["TRAPPED_PERSON", "MEDICATION_NEED", "WATER_REQUEST", "SAFE_STATUS", "WATER_LEVEL",
+                             "SMOKE_DENSITY", "COLLAPSE_RISK", "WATER_SHORTAGE", "POTENTIAL_FIRE_CLUSTER"]},
+    "source_class": {"enum": ["SURVIVOR", "RESPONDER", "ENV_SENSOR", "STRUCT_SENSOR", "GATEWAY", "AGGREGATE_DERIVED"]},
+    "fidelity_level": {"type": "integer", "minimum": 0, "maximum": 4},
+    "geo_cell": {"type": "string"},
+    "lat": {"type": "number"}, "lon": {"type": "number"},
+    "observed_at": {"type": "number"},
+    "value": {"type": "number"},
+    "bucket": {"type": "integer"},
+    "observation_key": {"type": "string"},
+    "origin_node": {"type": "string"},
+    "triggered": {"type": "boolean"},
+    "evidence_len": {"type": "integer"},
+    "integrity_commitment": {"type": "string"},
+    "note": {"type": "string"},
+    "policy_version": {"type": "string"}
+  }
+}

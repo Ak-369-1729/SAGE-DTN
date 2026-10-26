@@ -65,5 +65,15 @@ def run(req: RunRequest):
         cfg.recovery_request_s = cfg.source_loss_s + cfg.step_s
     sim = Simulation(cfg, req.mode, ml_gate=_ml_gate() if MODES[req.mode].get("ml") else None, timeline=True)
     metrics = sim.run()
-    return {"metrics": metrics, "timeline": sim.timeline, "events": sim.events_log,
-            "cells_m": 500, "villages": [[2000, 2000], [6000, 2500], [4000, 6000]][: cfg.n_villages], "base": [600, 7400]}
+    return _clean({"metrics": metrics, "timeline": sim.timeline, "events": sim.events_log,
+            "cells_m": 500, "villages": [[2000, 2000], [6000, 2500], [4000, 6000]][: cfg.n_villages], "base": [600, 7400]})
+
+
+def _clean(o):
+    if isinstance(o, float) and o != o:
+        return None
+    if isinstance(o, dict):
+        return {k: _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_clean(v) for v in o]
+    return o

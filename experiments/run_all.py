@@ -17,7 +17,8 @@ STEPS = ["e1_spl_property.py", "e2_ecp_duplicates.py", "e6_convergence.py", "e4_
 
 
 def main():
-    for s in STEPS:
+    steps = sys.argv[1:] or STEPS
+    for s in steps:
         t = time.time()
         print(f"==> {s}", flush=True)
         r = subprocess.run([sys.executable, str(HERE / s)], cwd=HERE)
