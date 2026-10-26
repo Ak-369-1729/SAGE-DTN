@@ -80,8 +80,9 @@ might, against the preliminary references in `PRIOR_ART_MATRIX.md` (D-numbers be
   within ~0.03 of the full core; the full core's advantage there is in bytes, storage and SA, not CDR.
   Evidence availability at responders is **lower** for the CPMM modes than for record modes (column
   `critical_evidence_at_responder`) — any claim implying better evidence delivery is unsupported.
-* No effect of sensor-rate adaptation (INCREASE_SENSOR_AGGREGATION) on bytes was measured in CPMM modes
-  (sensor data is already sketched); do not claim it as a bandwidth effect.
+* Sensor-rate adaptation had an effect only at the highest sensor rate tested (12 publications/min: about 9 %
+  fewer sensor bytes and 11 % lower energy proxy, H vs G, E5) and none at ≤4/min. Claim it, if at all, as a
+  dependent feature without a quantified effect.
 
 ## 9. Outcome of self-examination
 Proceed only with the narrowed claim set in `CLAIMS_PROSECUTION_DRAFT.md`. No new matter was added there:

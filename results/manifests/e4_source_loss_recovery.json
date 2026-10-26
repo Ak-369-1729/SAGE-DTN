@@ -13,11 +13,11 @@
     10
   ],
   "scenario": "source loss F0_0,F0_1 @5400s, request @5460s",
-  "code_version": "1.1.0+g913a661",
+  "code_version": "1.1.0+gb085bbc",
   "policy_version": "SPL-1.0.0",
   "registry_digest": "12a165f1f65d0f83",
-  "timestamp_utc": "2026-10-26T19:00:24Z",
-  "wall_s": 96.9,
+  "timestamp_utc": "2026-10-26T19:40:30Z",
+  "wall_s": 149.8,
   "python": "3.13.17",
   "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
   "configuration": {
@@ -31,7 +31,12 @@
       0.0,
       0.1
     ],
-    "mode": "I_full_recovery"
+    "placements": [
+      "first_contact",
+      "prefer_mobile"
+    ],
+    "mode": "I_full_recovery",
+    "note": "prefer_mobile was added after the first_contact run showed co-located replicas sharing the source's fate"
   },
   "outputs": [
     "results/raw/e4_recovery.csv",

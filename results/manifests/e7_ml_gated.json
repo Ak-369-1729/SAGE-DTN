@@ -6,11 +6,11 @@
     "ml3"
   ],
   "scenario": "synthetic generators in ml/data.py (train/test disjoint seeds)",
-  "code_version": "1.1.0+nogit",
+  "code_version": "1.1.0+gb085bbc",
   "policy_version": "SPL-1.0.0",
   "registry_digest": "12a165f1f65d0f83",
-  "timestamp_utc": "2026-10-26T18:49:44Z",
-  "wall_s": 1.7,
+  "timestamp_utc": "2026-10-26T19:46:04Z",
+  "wall_s": 4.5,
   "python": "3.13.17",
   "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
   "configuration": {

@@ -226,3 +226,26 @@ learned advisors act only through deterministic gates.
 
 **Apparatus.** 27. A node comprising a processor, a radio, storage and a battery configured to perform the
 method of claim 1. 28. A computer-readable medium storing instructions which when executed perform claim 1.
+
+---
+
+## EXPERIMENT_RESULTS (appendix to §9)
+Simulated results only, from one synthetic scenario family; see `EXPERIMENT_REPORT.md` for method, seeds and
+limitations, and `results/manifests/*.json` for provenance. These numbers support the description of
+technical effects and are **not** recited in any claim.
+
+| Effect | Measurement | Source |
+|---|---|---|
+| Invariant permit blocks destructive reduction | 0 of 138,060 forbidden transitions committed; 0 of 61,940 legal rejected | E1, `e1_spl_summary.csv` |
+| Same reduction without the permit destroys critical information | 2.8 % (0.5× load) to 22.6 % (8×) critical info lost vs 0 % with the permit | E3, `critical_info_loss` |
+| Partitioned mergeable state lowers transmitted bytes and storage | ~50 % lower TBT; 2.6–4.6× lower peak node storage vs record-based utility modes | E3 |
+| Partitioned state isolates human reports from sensor traffic | human CDR 0.828 flat for 1–12 sensor publications/min vs record modes falling to 0.375–0.722 | E5 |
+| Duplicate-insensitive promotion input | estimate independent of replay ×1–×100; raw counts give false promotion in 52.5 %–100 % of cases | E2 |
+| Deterministic convergence of promoted events | 1 distinct final state across 20 merge orders per seed; 0 nodes disagree on promoted events | E6 |
+| Evidence recovery with integrity | recovery 1.0 with mobile-preferring placement at R≥1 (no corruption); 0 corrupt evidence accepted | E4 |
+
+Negative or neutral findings (disclosed for completeness): at load ≤2× a utility + invariant-permit record
+store delivers the same critical delivery rate as the full system; evidence delivery to responders is lower
+with the partitioned state than with record-based modes; HLL inputs miss about 12.5 % of near-threshold
+promotions where an exact distinct set misses none; the gated ML threshold advisor gives no measurable gain
+over the deterministic adaptive threshold.

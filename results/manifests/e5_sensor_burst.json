@@ -1,0 +1,39 @@
+{
+  "experiment": "e5_sensor_burst",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "scenario": "default topology, varying sensor publish period",
+  "code_version": "1.1.0+gb085bbc",
+  "policy_version": "SPL-1.0.0",
+  "registry_digest": "12a165f1f65d0f83",
+  "timestamp_utc": "2026-10-26T19:45:58Z",
+  "wall_s": 155.9,
+  "python": "3.13.17",
+  "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+  "configuration": {
+    "periods_s": [
+      60.0,
+      30.0,
+      15.0,
+      5.0
+    ],
+    "modes": [
+      "A_flooding",
+      "B_store_forward",
+      "C_priority",
+      "D_utility",
+      "E_adaptive_no_spl",
+      "F_utility_spl",
+      "G_utility_spl_cpmm",
+      "H_full_core",
+      "I_full_recovery"
+    ]
+  },
+  "outputs": [
+    "results/raw/e5_sensor_burst.csv",
+    "results/tables/e5_sensor_burst_summary.csv"
+  ]
+}

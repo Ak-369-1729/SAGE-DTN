@@ -1,0 +1,23 @@
+{
+  "experiment": "e6_convergence",
+  "seeds": [
+    1,
+    2
+  ],
+  "scenario": "end-state of H run, random permutations",
+  "code_version": "1.1.0+gb085bbc",
+  "policy_version": "SPL-1.0.0",
+  "registry_digest": "12a165f1f65d0f83",
+  "timestamp_utc": "2026-10-26T19:38:00Z",
+  "wall_s": 311.5,
+  "python": "3.13.17",
+  "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+  "configuration": {
+    "permutations": 20,
+    "duplicate_delivery_prob": 0.2
+  },
+  "outputs": [
+    "results/raw/e6_convergence.csv",
+    "results/tables/e6_convergence_summary.csv"
+  ]
+}
