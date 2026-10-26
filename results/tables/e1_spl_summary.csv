@@ -1,0 +1,10 @@
+metric,value
+attempted_forbidden,138060
+attempted_legal,61940
+committed_forbidden,0
+committed_legal,61940
+rejected_forbidden,138060
+rejected_legal,0
+transition_calls,200000
+SPLViolationRate,0.0
+false_rejection_rate,0.0

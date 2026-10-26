@@ -1,0 +1,4 @@
+experiment,variant,records,salient_recall,false_preserve_rate,extra_bytes_per_record,spl_violations
+ML-3 saliency,drop_free_text,800,0.0,0.0,0.0,0
+ML-3 saliency,keyword_regex,800,0.6584158415841584,0.0,7.89875,0
+ML-3 saliency,ml_gated,800,0.8316831683168316,0.0,10.0475,0
