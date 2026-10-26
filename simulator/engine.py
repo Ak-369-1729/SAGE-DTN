@@ -218,9 +218,13 @@ class Simulation:
                     continue
                 for sensor in sens:
                     e0 = sensor.energy_used
-                    for a in sensor.step(self.env, t, cfg.step_s):
-                        self._register_truth(a, a.observed_at)
-                        n.ingest(a, f"msg:{a.event_id}", a.observed_at)
+                    # sub-step so publish periods shorter than the simulation tick take effect
+                    k = max(1, int(np.ceil(cfg.step_s / max(1.0, sensor.cfg.publish_period_s * sensor.publish_multiplier))))
+                    sub = cfg.step_s / k
+                    for i in range(k):
+                        for a in sensor.step(self.env, t + i * sub, sub):
+                            self._register_truth(a, a.observed_at)
+                            n.ingest(a, f"msg:{a.event_id}", a.observed_at)
                     self.sensor_energy += sensor.energy_used - e0
             # node maintenance
             for nid in self.order:

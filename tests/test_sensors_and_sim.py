@@ -32,3 +32,9 @@ def test_every_mode_runs_and_is_deterministic():
         r1, r2 = run(cfg, m), run(cfg, m)
         for k in ("TBT_bytes", "CDR", "critical_generated", "peak_storage_B"):
             assert r1[k] == r2[k] or (r1[k] != r1[k] and r2[k] != r2[k]), (m, k)
+
+
+def test_sensor_publish_period_shorter_than_tick_takes_effect():
+    slow = run(ScenarioConfig(horizon_s=1800, seed=3, sensor_publish_s=60.0), "B_store_forward")
+    fast = run(ScenarioConfig(horizon_s=1800, seed=3, sensor_publish_s=15.0), "B_store_forward")
+    assert fast["sensor_observations"] >= 3 * slow["sensor_observations"]
