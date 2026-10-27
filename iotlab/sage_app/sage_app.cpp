@@ -180,7 +180,7 @@ int insertRec(const AEIO& a, bool hasCommit) {
 }
 
 void reductionPass() {
-  if (cfg.mode == 'A' || isSink()) return;
+  if (cfg.mode == 'A' || isSink() || phase < 0) return;   // no new reductions during the E6 all-contact sync
   float P = (float)storeCount() / (float)capacity(); if (P > 1) P = 1;
   for (auto& r : recs) {
     if (!r.used) continue;
