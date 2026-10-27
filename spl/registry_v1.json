@@ -1,0 +1,27 @@
+{
+  "policy_version": "SPL-1.0.0",
+  "description": "Deterministic event/source invariant registry. Fidelity levels: lower number = higher fidelity. A transition Fi->Fj commits only if level(Fj) <= level(min_fidelity) and every required invariant extracted from the candidate equals the value extracted from the source.",
+  "freshness_quantum_s": 300,
+  "rules": {
+    "TRAPPED_PERSON":   {"preservation_class": "PROTECTED", "min_fidelity": 1, "aggregation_class": "NONE",
+                         "invariants": ["trapped_status", "usable_location", "freshness"], "critical": true},
+    "MEDICATION_NEED":  {"preservation_class": "PROTECTED", "min_fidelity": 1, "aggregation_class": "NONE",
+                         "invariants": ["medication_category_or_label", "urgency", "usable_location"], "critical": true},
+    "WATER_REQUEST":    {"preservation_class": "AGGREGATABLE", "min_fidelity": 3, "aggregation_class": "DISTINCT_COUNT",
+                         "invariants": ["geo_cell", "approximate_unique_count_semantics", "freshness"], "critical": false,
+                         "note": "registry extension (not in PRD minimum): freshness and unique-count semantics required so that ECP growth/replay resistance is computable"},
+    "SAFE_STATUS":      {"preservation_class": "AGGREGATABLE", "min_fidelity": 3, "aggregation_class": "DISTINCT_COUNT",
+                         "invariants": ["geo_cell", "approximate_unique_count_semantics"], "critical": false},
+    "WATER_LEVEL":      {"preservation_class": "AGGREGATABLE", "min_fidelity": 3, "aggregation_class": "BUCKET_DISTRIBUTION",
+                         "invariants": ["water_level_bucket", "geo_cell", "freshness"], "critical": false},
+    "SMOKE_DENSITY":    {"preservation_class": "AGGREGATABLE", "min_fidelity": 3, "aggregation_class": "BUCKET_DISTRIBUTION",
+                         "invariants": ["smoke_density_bucket", "geo_cell", "freshness"], "critical": false},
+    "COLLAPSE_RISK":    {"preservation_class": "AGGREGATABLE", "min_fidelity": 3, "aggregation_class": "BUCKET_DISTRIBUTION",
+                         "invariants": ["risk_state", "geo_cell", "freshness"], "critical": false,
+                         "protect_if": {"field": "risk_state", "in": ["ELEVATED", "HIGH"], "min_fidelity": 2, "critical_if_in": ["HIGH"]}},
+    "WATER_SHORTAGE":   {"preservation_class": "DERIVED_PROTECTED", "min_fidelity": 2, "aggregation_class": "NONE",
+                         "invariants": ["rule_id", "geo_cell", "freshness"], "critical": true},
+    "POTENTIAL_FIRE_CLUSTER": {"preservation_class": "DERIVED_PROTECTED", "min_fidelity": 2, "aggregation_class": "NONE",
+                         "invariants": ["rule_id", "geo_cell", "freshness"], "critical": true}
+  }
+}

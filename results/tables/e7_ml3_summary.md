@@ -1,0 +1,5 @@
+| experiment | variant | records | salient_recall | false_preserve_rate | extra_bytes_per_record | spl_violations |
+|---|---|---|---|---|---|---|
+| ML-3 saliency | drop_free_text | 2000 | 0 | 0 | 0 | 0 |
+| ML-3 saliency | keyword_regex | 2000 | 0.661 | 0 | 7.62 | 0 |
+| ML-3 saliency | ml_gated | 2000 | 1 | 0 | 11.6 | 0 |

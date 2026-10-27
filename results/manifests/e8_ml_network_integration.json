@@ -1,0 +1,25 @@
+{
+  "experiment": "e8_ml_network_integration",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "scenario": "default, loads 1x and 4x",
+  "code_version": "1.1.0+gb085bbc",
+  "policy_version": "SPL-1.0.0",
+  "registry_digest": "12a165f1f65d0f83",
+  "timestamp_utc": "2026-10-26T19:47:18Z",
+  "wall_s": 72.6,
+  "python": "3.13.17",
+  "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+  "configuration": {
+    "modes": [
+      "I_full_recovery",
+      "J_full_gated_ml"
+    ]
+  },
+  "outputs": [
+    "results/tables/e8_ml_network_summary.csv"
+  ]
+}

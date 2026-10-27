@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sage.recovery_request.v1",
+  "title": "Evidence recovery request",
+  "type": "object",
+  "required": ["schema", "event_id", "requester", "role", "token"],
+  "properties": {
+    "schema": {"const": "sage.recovery_request.v1"},
+    "event_id": {"type": "string"},
+    "evidence_id": {"type": "string"},
+    "requester": {"type": "string"},
+    "role": {"enum": ["RESPONDER", "COORDINATOR"]},
+    "token": {"type": "string", "description": "capability token (HMAC in simulator; asymmetric signature in deployment)"}
+  }
+}

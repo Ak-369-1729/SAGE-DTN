@@ -1,0 +1,113 @@
+{
+  "experiment": "e3_network_load",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "scenario": "3 villages, 2 field + 2 sensor nodes each, 3 ferries, 2 responders",
+  "code_version": "1.1.0+gb085bbc",
+  "policy_version": "SPL-1.0.0",
+  "registry_digest": "12a165f1f65d0f83",
+  "timestamp_utc": "2026-10-26T19:43:22Z",
+  "wall_s": 171.9,
+  "python": "3.13.17",
+  "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+  "configuration": {
+    "loads": [
+      0.5,
+      1,
+      2,
+      4,
+      8
+    ],
+    "modes": [
+      "A_flooding",
+      "B_store_forward",
+      "C_priority",
+      "D_utility",
+      "E_adaptive_no_spl",
+      "F_utility_spl",
+      "G_utility_spl_cpmm",
+      "H_full_core",
+      "I_full_recovery"
+    ],
+    "base": {
+      "name": "default",
+      "seed": 1,
+      "horizon_s": 10800,
+      "step_s": 60,
+      "n_villages": 3,
+      "field_per_village": 2,
+      "sensor_per_village": 2,
+      "n_ferries": 3,
+      "n_responders": 2,
+      "ferry_speed_mps": 8.0,
+      "contact_dwell_s": 300.0,
+      "radio_range_m": 600.0,
+      "bandwidth_Bps": 1000.0,
+      "storage_field_B": 262144,
+      "storage_sensor_B": 131072,
+      "storage_ferry_B": 1048576,
+      "battery_field_J": 20000.0,
+      "battery_sensor_J": 5000.0,
+      "battery_ferry_J": 200000.0,
+      "energy_tx_J_per_B": 1e-06,
+      "energy_rx_J_per_B": 5e-07,
+      "human_load": 1.0,
+      "human_rates_per_village_h": {
+        "TRAPPED_PERSON": 2.0,
+        "MEDICATION_NEED": 2.0,
+        "WATER_REQUEST": 6.0,
+        "SAFE_STATUS": 30.0
+      },
+      "water_surge": {
+        "village": 1,
+        "start_s": 3600,
+        "rate_per_h": 40.0
+      },
+      "flood_village": 0,
+      "fire": {
+        "village": 2,
+        "start_s": 5400
+      },
+      "quake": {
+        "village": 1,
+        "start_s": 4000,
+        "duration_s": 420,
+        "peak_g": 0.3
+      },
+      "duplicate_rate": 0.3,
+      "max_duplicates": 3,
+      "evidence_bytes": {
+        "TRAPPED_PERSON": 4096,
+        "MEDICATION_NEED": 2048,
+        "WATER_REQUEST": 256,
+        "SAFE_STATUS": 128
+      },
+      "sensor_publish_s": 60.0,
+      "sensor_sample_hz": 10.0,
+      "sensor_failure_s": null,
+      "hll_p": 8,
+      "window_s": 300,
+      "windows_kept": 48,
+      "evidence_replicas": 3,
+      "source_loss_s": null,
+      "source_loss_nodes": [],
+      "recovery_request_s": null,
+      "replica_corrupt_prob": 0.0,
+      "replica_placement": "first_contact",
+      "protected_forward_max_fidelity": null,
+      "ml": false,
+      "utility": {},
+      "ecp_thresholds": {},
+      "sample_every_steps": 5
+    }
+  },
+  "outputs": [
+    "results/raw/e3_network_load.csv",
+    "results/tables/e3_network_load_summary.csv"
+  ]
+}

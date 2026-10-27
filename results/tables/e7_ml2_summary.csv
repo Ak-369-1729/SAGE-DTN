@@ -1,0 +1,4 @@
+experiment,variant,cells,mean_rel_error,mean_abs_rel_error,undercount_cells,merges,false_merges
+ML-2 duplicate prior,exact_key_sketch,200,0.799915923034213,0.799915923034213,0,0,0
+ML-2 duplicate prior,deterministic_heuristic,200,0.4785368376176969,0.4785368376176969,0,3814,1
+ML-2 duplicate prior,ml_gated,200,0.06590322179703825,0.06590322179703825,0,8638,21

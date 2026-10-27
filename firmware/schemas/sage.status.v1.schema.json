@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sage.status.v1",
+  "title": "Node status heartbeat",
+  "type": "object",
+  "required": ["schema", "node"],
+  "properties": {"schema": {"const": "sage.status.v1"}, "node": {"type": "string"}, "battery": {"type": "number"},
+                 "protected": {"type": "integer"}, "water_est": {"type": "number"}, "safe_est": {"type": "number"}}
+}
