@@ -37,6 +37,13 @@ g++ -std=c++17 firmware/common/test_sage_core.cpp -o /tmp/t && /tmp/t   # firmwa
 ```
 Wokwi: see `wokwi/README.md`. ESP32 build/flash: see `firmware/README.md`.
 
+### Real radios on FIT IoT-LAB
+```bash
+./iotlab/run_local.sh                 # test the hardware pipeline locally (no account)
+./iotlab/run_on_iotlab.sh             # on the IoT-LAB SSH frontend: reserve, flash, run E1-E6, collect
+```
+RIOT OS port for IoT-LAB M3 / nRF52840 nodes. See `iotlab/README.md`. Hardware results: `iotlab/results/` (PENDING until run).
+
 ### Docker
 ```bash
 docker build -f docker/Dockerfile -t sage-dtn .
@@ -62,6 +69,7 @@ docker run sage-dtn python experiments/run_all.py # experiments
 | `experiments/` | E1–E8 runners, plots, report tables, `run_all.py` |
 | `tests/` | pytest suite (hypothesis property tests) |
 | `firmware/` | ESP32 field / sensor / responder node firmware, BOM, pin map, schemas |
+| `iotlab/` | RIOT OS port for FIT IoT-LAB nodes, controller, analyzer, one-command run scripts |
 | `wokwi/` | Wokwi sensor-node project |
 | `docs/` | architecture, threat model, methodology, PRD v1.1, patent package, prior art, filing checklist, simulated FER |
 | `results/` | Generated CSV / plots / manifests |
@@ -73,5 +81,5 @@ All modes share the same seeds, contact traces and workloads.
 
 ## Honest status
 See `EXPERIMENT_REPORT.md` for results, failures and the GO/NO-GO assessment. Not done here: ESP32 toolchain
-build/flash, real radios, Wokwi execution, field trials. The patent documents are drafts for review by a
+build/flash, IoT-LAB hardware runs (scripts ready, results PENDING), Wokwi execution, field trials. The patent documents are drafts for review by a
 registered patent agent; nothing here is legal advice or a promise of grant.

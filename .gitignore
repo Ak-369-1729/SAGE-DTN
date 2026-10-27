@@ -5,3 +5,5 @@ __pycache__/
 .hypothesis/
 firmware/**/build/
 *.log
+iotlab/riot/bin/
+iotlab/riot/build.log
