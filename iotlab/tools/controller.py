@@ -194,7 +194,7 @@ def run_trial(be, lay, idx, t, args, seed):
     time.sleep(1.0)
     for r in roles:
         be.send(r["node"], "cfg id=%d role=%s grp=%d mode=%s trial=%d cap=%d rcap=160 bud=%d V=%d nf=%d R=%d ecpw=%d ecps=2 corrupt=%d tau=%d" % (
-            r["id"], r["role"], r["grp"], t["mode"], idx % 250 + 1, args.cap, args.bud, lay["V"], lay["nf"], t["R"], args.ecpw, t["corrupt"], args.tau))
+            r["id"], r["role"], r["grp"], t["mode"], idx % 250 + 1, 160 if t["conv"] else args.cap, args.bud, lay["V"], lay["nf"], t["R"], args.ecpw, t["corrupt"], args.tau))
         time.sleep(0.05)
     time.sleep(1.0)
     seq = 0
@@ -253,8 +253,9 @@ def run_trial(be, lay, idx, t, args, seed):
         rest = start + ph_s - time.time()
         if rest > 0:
             time.sleep(rest)
-    if t["conv"]:   # E6: everyone in contact, then compare state digests
-        for k in range(3):
+    if t["conv"]:   # E6: everyone in contact with a larger radio budget, then compare state digests
+        be.send(None, "cfg bud=%d" % (4 * args.bud))
+        for k in range(5):
             be.send(None, "ph -1 %d" % int(time.time() - t0))
             be.ctl("phase -1")
             time.sleep(ph_s)
